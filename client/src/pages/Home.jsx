@@ -1,20 +1,18 @@
 import { Link } from 'react-router-dom'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { getPublicCategories, getPublicProducts } from '../../services/api'
 import './Home.css'
 
-const fruits = [
-  { id: 1, name: 'Mango', category: 'Seasonal', price: 120, stock: 'In Stock' },
-  { id: 2, name: 'Dragon Fruit', category: 'Exotic', price: 180, stock: 'In Stock' },
-  { id: 3, name: 'Banana', category: 'Offers', price: 60, stock: 'Low Stock' },
-  { id: 4, name: 'Pineapple', category: 'Seasonal', price: 90, stock: 'In Stock' },
-  { id: 5, name: 'Avocado', category: 'Exotic', price: 220, stock: 'In Stock' },
-]
-
-const categoryOptions = ['All', 'Seasonal', 'Exotic', 'Offers']
-
 function Home() {
+  const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [selectedCategories, setSelectedCategories] = useState(['all'])
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false)
+  const [loadingProducts, setLoadingProducts] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [currentUser, setCurrentUser] = useState(() => {
     const token = localStorage.getItem('token')
     const storedUser = localStorage.getItem('user')
@@ -27,19 +25,69 @@ function Home() {
     }
   })
 
-  const filteredFruits = useMemo(() => {
-    return fruits.filter((fruit) => {
-      const matchesSearch = fruit.name.toLowerCase().includes(searchText.toLowerCase())
-      const matchesCategory =
-        selectedCategory === 'all' || fruit.category.toLowerCase() === selectedCategory
+  useEffect(() => {
+    const loadHomeData = async () => {
+      setLoadingProducts(true)
+      setLoadError('')
+      try {
+        const [productData, categoryData] = await Promise.all([
+          getPublicProducts(),
+          getPublicCategories(),
+        ])
+
+        setProducts(productData)
+        setCategories(categoryData)
+      } catch (error) {
+        setLoadError(error.response?.data?.message || 'Failed to load fruits')
+      } finally {
+        setLoadingProducts(false)
+      }
+    }
+
+    loadHomeData()
+  }, [])
+
+  const filteredProducts = useMemo(() => {
+    const searchValue = searchText.trim().toLowerCase()
+    const allSelected = selectedCategories.includes('all')
+
+    return products.filter((product) => {
+      const matchesSearch = product.name?.toLowerCase().includes(searchValue)
+      const matchesCategory = allSelected || selectedCategories.includes(product.category)
       return matchesSearch && matchesCategory
     })
-  }, [searchText, selectedCategory])
+  }, [products, searchText, selectedCategories])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setCurrentUser(null)
+  }
+
+  const handleCategoryToggle = (categoryName) => {
+    if (categoryName === 'all') {
+      setSelectedCategories(['all'])
+      return
+    }
+
+    setSelectedCategories((prev) => {
+      const withoutAll = prev.filter((item) => item !== 'all')
+
+      if (withoutAll.includes(categoryName)) {
+        const updated = withoutAll.filter((item) => item !== categoryName)
+        return updated.length ? updated : ['all']
+      }
+
+      return [...withoutAll, categoryName]
+    })
+  }
+
+  const handleCartClick = () => {
+    if (!currentUser) {
+      navigate('/login')
+      return
+    }
+    navigate('/cart')
   }
 
   return (
@@ -62,55 +110,96 @@ function Home() {
           </div>
 
           <div className="filter-box">
-            <img src="/filter.svg" alt="" aria-hidden="true" className="filter-icon" />
-            <select
-              aria-label="Filter fruits by category"
-              value={selectedCategory}
-              onChange={(event) => setSelectedCategory(event.target.value)}
+            <button
+              type="button"
+              className="filter-trigger"
+              onClick={() => setShowCategoryFilter((prev) => !prev)}
+              aria-label="Filter fruits by categories"
             >
-              {categoryOptions.map((category) => (
-                <option key={category} value={category.toLowerCase()}>
-                  {category}
-                </option>
-              ))}
-            </select>
+              <img src="/filter.svg" alt="" aria-hidden="true" className="filter-icon" />
+              <span>Filter</span>
+            </button>
+
+            {showCategoryFilter ? (
+              <div className="category-filter-panel">
+                <label className="category-check">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes('all')}
+                    onChange={() => handleCategoryToggle('all')}
+                  />
+                  <span>All</span>
+                </label>
+                {categories.map((category) => (
+                  <label key={category._id} className="category-check">
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(category.name)}
+                      onChange={() => handleCategoryToggle(category.name)}
+                    />
+                    <span>{category.name}</span>
+                  </label>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
 
-        {currentUser ? (
-          <div className="user-actions">
-            <div className="user-pill">
-              <img src="/defaultuserimg.svg" alt="Default user avatar" />
-              <span>{currentUser.name || 'User'}</span>
+        <div className="header-actions">
+          <button type="button" className="cart-btn" aria-label="Open cart" onClick={handleCartClick}>
+            <img src="/cart.svg" alt="Cart" />
+          </button>
+
+          {currentUser ? (
+            <div className="user-actions">
+              {currentUser.role === 'admin' ? (
+                <button type="button" className="admin-btn" onClick={() => navigate('/admin')}>
+                  Admin
+                </button>
+              ) : null}
+              <div className="user-pill">
+                <img src="/defaultuserimg.svg" alt="Default user avatar" />
+                <span>{currentUser.name || 'User'}</span>
+              </div>
+              <button type="button" className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
-            <button type="button" className="logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        ) : (
-          <Link to="/login" className="login-btn">
-            <img src="/defaultuserimg.svg" alt="Default user avatar" />
-            <span>Login</span>
-          </Link>
-        )}
+          ) : (
+            <Link to="/login" className="login-btn">
+              <img src="/defaultuserimg.svg" alt="Default user avatar" />
+              <span>Login</span>
+            </Link>
+          )}
+        </div>
       </header>
 
-      <section className="fruit-results">
+      <section className="home-content">
         <h2>Fresh Fruits</h2>
-        {filteredFruits.length === 0 ? (
-          <p className="no-results">No fruits found for your search/filter.</p>
-        ) : (
-          <div className="fruit-grid">
-            {filteredFruits.map((fruit) => (
-              <article key={fruit.id} className="fruit-card">
-                <h3>{fruit.name}</h3>
-                <p>{fruit.category}</p>
-                <p>Rs {fruit.price}/kg</p>
-                <span>{fruit.stock}</span>
-              </article>
-            ))}
-          </div>
-        )}
+        {loadError ? <p>{loadError}</p> : null}
+        {loadingProducts ? <p>Loading fruits...</p> : null}
+        {!loadingProducts && !loadError ? (
+          filteredProducts.length ? (
+            <div className="product-grid">
+              {filteredProducts.map((product) => (
+                <article key={product._id} className="product-card">
+                  <img
+                    src={product.image || '/logo.svg'}
+                    alt={product.name}
+                    className="product-image"
+                  />
+                  <h3>{product.name}</h3>
+                  <p className="product-meta">{product.category}</p>
+                  <p className="product-price">Rs {product.price}/kg</p>
+                  <p className="product-desc">{product.description || 'No description available'}</p>
+                  <p className="product-stock">Stock: {product.stock}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p>No fruits found.</p>
+          )
+        ) : null}
       </section>
     </div>
   )

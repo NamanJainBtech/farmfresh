@@ -7,6 +7,6 @@ const productSchema = new mongoose.Schema({
   description: String,
   image: String,
   stock: Number
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Product", productSchema);

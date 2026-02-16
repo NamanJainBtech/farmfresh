@@ -20,7 +20,11 @@ function Login() {
       const data = await loginUser({ email, password })
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      navigate('/')
+      if (data.user?.role === 'admin') {
+        navigate('/admin')
+      } else {
+        navigate('/')
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.')
     } finally {
