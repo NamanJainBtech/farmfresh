@@ -1,0 +1,19 @@
+<svg width="220" height="60" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="FarmFresh Logo">
+  <defs>
+    <linearGradient id="leafGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4CAF50"></stop>
+      <stop offset="100%" stop-color="#2E7D32"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- Leaf Icon -->
+  <g transform="translate(10,10)">
+    <path d="M20 35C5 25 5 5 35 5C35 35 15 45 20 35Z" fill="url(#leafGradient)"></path>
+    <path d="M20 35C20 20 28 12 35 5" stroke="#1B5E20" stroke-width="2" fill="none" stroke-linecap="round"></path>
+  </g>
+
+  <!-- Text -->
+  <text x="65" y="38" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#2E7D32">
+    Farm<tspan fill="#66BB6A">Fresh</tspan>
+  </text>
+</svg>
