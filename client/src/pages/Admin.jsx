@@ -324,19 +324,19 @@ function Admin() {
             </article>
             <article className="admin-card">
               <h3>Total Sales</h3>
-              <p>Rs {report.totalRevenue}</p>
+              <p>₹ {report.totalRevenue}</p>
             </article>
             <article className="admin-card">
               <h3>Delivered Revenue</h3>
-              <p>Rs {report.deliveredRevenue}</p>
+              <p>₹ {report.deliveredRevenue}</p>
             </article>
             <article className="admin-card">
               <h3>Today Sales</h3>
-              <p>Rs {report.todayRevenue}</p>
+              <p>₹ {report.todayRevenue}</p>
             </article>
             <article className="admin-card">
               <h3>This Month Sales</h3>
-              <p>Rs {report.monthRevenue}</p>
+              <p>₹ {report.monthRevenue}</p>
             </article>
           </section>
 
@@ -360,7 +360,7 @@ function Admin() {
               report.dailySales.map((entry) => (
                 <div key={entry.date} className="admin-list-row">
                   <strong>{entry.date}</strong>
-                  <p>Rs {entry.revenue}</p>
+                  <p>₹ {entry.revenue}</p>
                 </div>
               ))
             ) : (
@@ -578,11 +578,18 @@ function Admin() {
           <div className="admin-list">
             {products.map((product) => (
               <div key={product._id} className="admin-list-row">
-                <div>
-                  <strong>{product.name}</strong>
-                  <p>
-                    {product.category} | Rs {product.price}/kg | Stock: {product.stock}
-                  </p>
+                <div className="admin-product-main">
+                  <img
+                    src={product.image || "/logo.svg"}
+                    alt={product.name}
+                    className="admin-product-image"
+                  />
+                  <div>
+                    <strong>{product.name}</strong>
+                    <p>
+                      {product.category} | ₹ {product.price}/kg | Stock: {product.stock}
+                    </p>
+                  </div>
                 </div>
                 <div className="admin-row-actions">
                   <button type="button" onClick={() => handleEditProduct(product)}>
@@ -607,7 +614,7 @@ function Admin() {
                 <div>
                   <strong>Order #{order._id.slice(-6)}</strong>
                   <p>
-                    Customer: {order.user?.name || "Unknown"} | Total: Rs {order.totalAmount} | Status:{" "}
+                    Customer: {order.user?.name || "Unknown"} | Total: ₹ {order.totalAmount} | Status:{" "}
                     {order.status}
                   </p>
                 </div>

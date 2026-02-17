@@ -1,0 +1,147 @@
+.cart-page {
+  min-height: 100vh;
+  padding: 20px 28px;
+  background: #f7fbf4;
+}
+
+.cart-content {
+  margin-top: 24px;
+  background: #ffffff;
+  border: 1px solid #e5efe0;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.cart-content h1 {
+  margin: 0 0 12px;
+  color: #1d4b27;
+}
+
+.cart-error {
+  margin: 0 0 12px;
+  color: #b73939;
+}
+
+.cart-list {
+  display: grid;
+  gap: 10px;
+}
+
+.cart-row {
+  border: 1px solid #e2eddc;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.cart-item-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cart-item-main h3 {
+  margin: 0 0 4px;
+  color: #1f4528;
+}
+
+.cart-item-main p {
+  margin: 0;
+  color: #46634b;
+}
+
+.cart-item-image {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #edf3ea;
+}
+
+.cart-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qty-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty-box button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #c8ddc1;
+  border-radius: 8px;
+  background: #edf7e8;
+  color: #1f5f2c;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.qty-box span {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 600;
+  color: #1f4528;
+}
+
+.cart-subtotal {
+  margin: 0;
+  color: #1f5f2c;
+  font-weight: 700;
+}
+
+.remove-btn {
+  border: 1px solid #f5c4c4;
+  border-radius: 8px;
+  background: #fff2f2;
+  color: #b73939;
+  font-weight: 600;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.cart-total {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  color: #1d4b27;
+}
+
+@media (max-width: 900px) {
+  .cart-page {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  .cart-page {
+    padding: 10px;
+  }
+
+  .cart-content {
+    margin-top: 16px;
+    padding: 14px;
+  }
+
+  .cart-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cart-item-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .cart-total {
+    justify-content: flex-start;
+  }
+}

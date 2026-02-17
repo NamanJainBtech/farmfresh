@@ -102,4 +102,24 @@ export const getPublicCategories = async () => {
   return response.data;
 };
 
+export const getCart = async () => {
+  const response = await api.get("/user/cart", authConfig());
+  return response.data;
+};
+
+export const addToCart = async (payload) => {
+  const response = await api.post("/user/cart", payload, authConfig());
+  return response.data;
+};
+
+export const updateCartItem = async (productId, quantity) => {
+  const response = await api.put(`/user/cart/${productId}`, { quantity }, authConfig());
+  return response.data;
+};
+
+export const removeCartItem = async (productId) => {
+  const response = await api.delete(`/user/cart/${productId}`, authConfig());
+  return response.data;
+};
+
 export default api;

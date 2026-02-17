@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./middleware/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const publicRoutes = require("./routes/publicRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -27,6 +28,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/public", publicRoutes);
+app.use("/api/user", userRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

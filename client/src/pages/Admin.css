@@ -224,6 +224,23 @@
   margin: 4px 0 0;
   color: #4d6252;
   font-size: 14px;
+  word-break: break-word;
+}
+
+.admin-product-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-product-image {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #ebf3e7;
+  flex-shrink: 0;
 }
 
 .cropper-box {
@@ -282,16 +299,37 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 680px) {
+  .admin-page {
+    padding: 12px;
+  }
+
   .admin-topbar {
     flex-wrap: wrap;
+  }
+
+  .admin-title {
+    font-size: 24px;
+  }
+
+  .admin-section {
+    padding: 12px;
+  }
+
+  .admin-form {
+    grid-template-columns: 1fr;
   }
 
   .admin-list-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .admin-product-main {
+    width: 100%;
   }
 
   .cropper-box {
@@ -313,5 +351,10 @@
   .admin-row-actions select,
   .admin-row-actions button {
     width: 100%;
+  }
+
+  .crop-preview-frame {
+    width: 180px;
+    height: 180px;
   }
 }

@@ -1,0 +1,44 @@
+.app-notification {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 90;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(22, 58, 29, 0.16);
+  animation: notification-in 0.2s ease-out;
+  max-width: min(92vw, 360px);
+}
+
+.app-notification.success {
+  background: #edf7e8;
+  color: #1f5f2c;
+  border: 1px solid #c8ddc1;
+}
+
+.app-notification.error {
+  background: #fff2f2;
+  color: #b73939;
+  border: 1px solid #f5c4c4;
+}
+
+@keyframes notification-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 560px) {
+  .app-notification {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    max-width: none;
+  }
+}

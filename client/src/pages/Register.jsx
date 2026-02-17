@@ -9,12 +9,21 @@ function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
+
+    if (password !== confirmPassword) {
+      setError('Password and confirm password must match.')
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -56,14 +65,42 @@ function Register() {
           />
 
           <label htmlFor="registerPassword">Password</label>
-          <input
-            id="registerPassword"
-            type="password"
-            placeholder="Create password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
+          <div className="password-field">
+            <input
+              id="registerPassword"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Create password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="show-password-btn"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
+
+          <label htmlFor="registerConfirmPassword">Confirm Password</label>
+          <div className="password-field">
+            <input
+              id="registerConfirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="show-password-btn"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+            >
+              {showConfirmPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
 
           {error ? <p className="register-error">{error}</p> : null}
           <button type="submit" disabled={loading}>

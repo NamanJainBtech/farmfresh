@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom'
 import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getPublicCategories, getPublicProducts } from '../../services/api'
+import { addToCart, getCart, getPublicCategories, getPublicProducts, updateCartItem } from '../../services/api'
+import Header from '../components/Header'
+import Notification from '../components/Notification'
 import './Home.css'
 
 function Home() {
@@ -13,6 +14,9 @@ function Home() {
   const [showCategoryFilter, setShowCategoryFilter] = useState(false)
   const [loadingProducts, setLoadingProducts] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [cartQuantities, setCartQuantities] = useState({})
+  const [notification, setNotification] = useState({ message: '', type: 'success' })
+  const [actionProductId, setActionProductId] = useState('')
   const [currentUser, setCurrentUser] = useState(() => {
     const token = localStorage.getItem('token')
     const storedUser = localStorage.getItem('user')
@@ -46,6 +50,28 @@ function Home() {
 
     loadHomeData()
   }, [])
+
+  useEffect(() => {
+    const loadCartQuantities = async () => {
+      if (!currentUser) {
+        setCartQuantities({})
+        return
+      }
+
+      try {
+        const cart = await getCart()
+        const quantityMap = {}
+        cart.items.forEach((item) => {
+          quantityMap[item.product._id] = item.quantity
+        })
+        setCartQuantities(quantityMap)
+      } catch {
+        setCartQuantities({})
+      }
+    }
+
+    loadCartQuantities()
+  }, [currentUser])
 
   const filteredProducts = useMemo(() => {
     const searchValue = searchText.trim().toLowerCase()
@@ -90,89 +116,130 @@ function Home() {
     navigate('/cart')
   }
 
+  const syncCartQuantities = (cartData) => {
+    const quantityMap = {}
+    cartData.items.forEach((item) => {
+      quantityMap[item.product._id] = item.quantity
+    })
+    setCartQuantities(quantityMap)
+  }
+
+  const setLocalQuantity = (productId, quantity) => {
+    setCartQuantities((prev) => {
+      const next = { ...prev }
+      if (quantity <= 0) {
+        delete next[productId]
+      } else {
+        next[productId] = quantity
+      }
+      return next
+    })
+  }
+
+  const handleAddToCart = async (product) => {
+    if (!currentUser) {
+      navigate('/login')
+      return
+    }
+    if (actionProductId === product._id) return
+
+    const previousQty = cartQuantities[product._id] || 0
+    const optimisticQty = previousQty + 1
+    setLocalQuantity(product._id, optimisticQty)
+    setNotification({ message: '', type: 'success' })
+    setActionProductId(product._id)
+    try {
+      const cartData = await addToCart({ productId: product._id, quantity: 1 })
+      syncCartQuantities(cartData)
+      setNotification({ message: 'Added to cart', type: 'success' })
+    } catch (error) {
+      setLocalQuantity(product._id, previousQty)
+      setNotification({
+        message: error.response?.data?.message || 'Failed to add item to cart',
+        type: 'error',
+      })
+    } finally {
+      setActionProductId('')
+    }
+  }
+
+  const handleIncreaseQuantity = async (product) => {
+    if (!currentUser) {
+      navigate('/login')
+      return
+    }
+    if (actionProductId === product._id) return
+
+    const currentQty = cartQuantities[product._id] || 0
+    if (currentQty >= Number(product.stock)) return
+    const nextQty = currentQty + 1
+
+    setLocalQuantity(product._id, nextQty)
+    setActionProductId(product._id)
+    try {
+      const cartData = currentQty
+        ? await updateCartItem(product._id, currentQty + 1)
+        : await addToCart({ productId: product._id, quantity: 1 })
+      syncCartQuantities(cartData)
+    } catch (error) {
+      setLocalQuantity(product._id, currentQty)
+      setNotification({
+        message: error.response?.data?.message || 'Failed to update quantity',
+        type: 'error',
+      })
+    } finally {
+      setActionProductId('')
+    }
+  }
+
+  const handleDecreaseQuantity = async (productId) => {
+    if (actionProductId === productId) return
+    const currentQty = cartQuantities[productId] || 0
+    if (currentQty <= 0) return
+    const nextQty = currentQty - 1
+
+    setLocalQuantity(productId, nextQty)
+    setActionProductId(productId)
+    try {
+      const cartData = await updateCartItem(productId, nextQty)
+      syncCartQuantities(cartData)
+      if (currentQty === 1) {
+        setNotification({ message: 'Removed from cart', type: 'success' })
+      }
+    } catch (error) {
+      setLocalQuantity(productId, currentQty)
+      setNotification({
+        message: error.response?.data?.message || 'Failed to update quantity',
+        type: 'error',
+      })
+    } finally {
+      setActionProductId('')
+    }
+  }
+
   return (
     <div className="home-page">
-      <header className="home-header">
-        <Link to="/" className="brand-logo" aria-label="FarmFresh Home">
-          <img src="/logo.svg" alt="FarmFresh logo" />
-        </Link>
+      <Notification
+        message={notification.message}
+        type={notification.type}
+        onClose={() => setNotification({ message: '', type: 'success' })}
+      />
 
-        <div className="search-filter-wrap">
-          <div className="search-bar">
-            <img src="/search.svg" alt="" aria-hidden="true" className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search fruits..."
-              aria-label="Search fruits"
-              value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
-            />
-          </div>
-
-          <div className="filter-box">
-            <button
-              type="button"
-              className="filter-trigger"
-              onClick={() => setShowCategoryFilter((prev) => !prev)}
-              aria-label="Filter fruits by categories"
-            >
-              <img src="/filter.svg" alt="" aria-hidden="true" className="filter-icon" />
-              <span>Filter</span>
-            </button>
-
-            {showCategoryFilter ? (
-              <div className="category-filter-panel">
-                <label className="category-check">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes('all')}
-                    onChange={() => handleCategoryToggle('all')}
-                  />
-                  <span>All</span>
-                </label>
-                {categories.map((category) => (
-                  <label key={category._id} className="category-check">
-                    <input
-                      type="checkbox"
-                      checked={selectedCategories.includes(category.name)}
-                      onChange={() => handleCategoryToggle(category.name)}
-                    />
-                    <span>{category.name}</span>
-                  </label>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="header-actions">
-          <button type="button" className="cart-btn" aria-label="Open cart" onClick={handleCartClick}>
-            <img src="/cart.svg" alt="Cart" />
-          </button>
-
-          {currentUser ? (
-            <div className="user-actions">
-              {currentUser.role === 'admin' ? (
-                <button type="button" className="admin-btn" onClick={() => navigate('/admin')}>
-                  Admin
-                </button>
-              ) : null}
-              <div className="user-pill">
-                <img src="/defaultuserimg.svg" alt="Default user avatar" />
-                <span>{currentUser.name || 'User'}</span>
-              </div>
-              <button type="button" className="logout-btn" onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
-          ) : (
-            <Link to="/login" className="login-btn">
-              <img src="/defaultuserimg.svg" alt="Default user avatar" />
-              <span>Login</span>
-            </Link>
-          )}
-        </div>
-      </header>
+      <Header
+        showSearch
+        showFilter
+        searchText={searchText}
+        onSearchChange={setSearchText}
+        showCategoryFilter={showCategoryFilter}
+        onToggleCategoryFilter={() => setShowCategoryFilter((prev) => !prev)}
+        categories={categories}
+        selectedCategories={selectedCategories}
+        onCategoryToggle={handleCategoryToggle}
+        currentUser={currentUser}
+        onCartClick={handleCartClick}
+        onLogout={handleLogout}
+        onAdminClick={() => navigate('/admin')}
+      />
 
       <section className="home-content">
         <h2>Fresh Fruits</h2>
@@ -190,9 +257,38 @@ function Home() {
                   />
                   <h3>{product.name}</h3>
                   <p className="product-meta">{product.category}</p>
-                  <p className="product-price">Rs {product.price}/kg</p>
                   <p className="product-desc">{product.description || 'No description available'}</p>
                   <p className="product-stock">Stock: {product.stock}</p>
+                  <div className="product-footer">
+                    <p className="product-price">₹ {product.price}/kg</p>
+                    {cartQuantities[product._id] ? (
+                      <div className="quantity-controls">
+                      <button
+                        type="button"
+                        onClick={() => handleDecreaseQuantity(product._id)}
+                      >
+                        -
+                      </button>
+                        <span>{cartQuantities[product._id]}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleIncreaseQuantity(product)}
+                          disabled={cartQuantities[product._id] >= Number(product.stock)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="add-cart-btn"
+                        onClick={() => handleAddToCart(product)}
+                        disabled={Number(product.stock) <= 0}
+                      >
+                      Add
+                      </button>
+                    )}
+                  </div>
                 </article>
               ))}
             </div>
