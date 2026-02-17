@@ -15,6 +15,9 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api" }
   ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
   "env": {
     "NODE_ENV": "production"
   }
