@@ -9,18 +9,20 @@ import Admin from './pages/Admin'
 function AdminRoute({ children }) {
   const token = localStorage.getItem('token')
   const rawUser = localStorage.getItem('user')
+  let user
 
   if (!token || !rawUser) {
     return <Navigate to="/login" replace />
   }
 
   try {
-    const user = JSON.parse(rawUser)
-    if (user.role !== 'admin') {
-      return <Navigate to="/" replace />
-    }
+    user = JSON.parse(rawUser)
   } catch {
     return <Navigate to="/login" replace />
+  }
+
+  if (user.role !== 'admin') {
+    return <Navigate to="/" replace />
   }
 
   return children
