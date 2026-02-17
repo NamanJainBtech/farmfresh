@@ -1,7 +1,11 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/index.js", "use": "@vercel/node" },
+    { 
+      "src": "api/index.js", 
+      "use": "@vercel/node",
+      "config": { "maxLambdaSize": "50mb" }
+    },
     {
       "src": "client/package.json",
       "use": "@vercel/static-build",
@@ -9,9 +13,11 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "src": "/assets/(.*)", "dest": "/client/dist/assets/$1" },
-    { "src": "/(.*\\.(js|css|svg|png|jpg|jpeg|gif|ico|webp|json|txt|map))", "dest": "/client/dist/$1" },
-    { "src": "/(.*)", "dest": "/client/dist/index.html" }
-  ]
+    { "src": "/api/(.*)", "dest": "/api" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
