@@ -48,7 +48,9 @@ router.post("/products", upload.single("image"), async (req, res) => {
       category,
       price: Number(price) || 0,
       description: description || "",
-      image: req.file ? `/uploads/${req.file.filename}` : image || "",
+      image: req.file
+        ? `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`
+        : image || "",
       stock: Number(stock) || 0
     });
 
@@ -73,7 +75,7 @@ router.put("/products/:id", upload.single("image"), async (req, res) => {
     }
 
     if (req.file) {
-      updatePayload.image = `/uploads/${req.file.filename}`;
+      updatePayload.image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
     }
 
     const updated = await Product.findByIdAndUpdate(req.params.id, updatePayload, {
