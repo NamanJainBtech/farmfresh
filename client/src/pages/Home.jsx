@@ -116,6 +116,22 @@ function Home() {
     navigate('/cart')
   }
 
+  const handleAccountClick = () => {
+    if (!currentUser) {
+      navigate('/login')
+      return
+    }
+    navigate('/account')
+  }
+
+  const handleOrderHistoryClick = () => {
+    if (!currentUser) {
+      navigate('/login')
+      return
+    }
+    navigate('/order-history')
+  }
+
   const syncCartQuantities = (cartData) => {
     const quantityMap = {}
     cartData.items.forEach((item) => {
@@ -239,6 +255,8 @@ function Home() {
         onCartClick={handleCartClick}
         onLogout={handleLogout}
         onAdminClick={() => navigate('/admin')}
+        onAccountClick={handleAccountClick}
+        onOrderHistoryClick={handleOrderHistoryClick}
       />
 
       <section className="home-content">

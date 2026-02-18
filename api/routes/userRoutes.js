@@ -132,4 +132,103 @@ router.delete("/cart/:productId", async (req, res) => {
   }
 });
 
+
+// Place order
+const Order = require("../models/Order");
+router.post("/order", async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate("cart.product");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const { address, slot, paymentMethod } = req.body;
+    if (!address || !slot) return res.status(400).json({ message: "Address and slot required" });
+    if (!user.cart.length) return res.status(400).json({ message: "Cart is empty" });
+    const selectedAddress = user.addresses.find(a => String(a._id) === String(address));
+    if (!selectedAddress) return res.status(400).json({ message: "Invalid address" });
+    const items = user.cart.map(entry => ({
+      product: entry.product._id,
+      name: entry.product.name,
+      price: entry.product.price,
+      quantity: entry.quantity,
+      subtotal: entry.product.price * entry.quantity
+    }));
+    const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
+    const order = await Order.create({
+      user: user._id,
+      items,
+      totalAmount,
+      address: `${selectedAddress.line1}, ${selectedAddress.city}`,
+      status: "Processing",
+      paymentMethod: paymentMethod || "COD"
+    });
+    user.cart = [];
+    await user.save();
+    res.json({ success: true, orderId: order._id });
+  } catch (error) {
+    res.status(500).json({ message: "Order failed" });
+  }
+});
+
+// Get user addresses
+router.get("/addresses", async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user.addresses || []);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch addresses" });
+  }
+});
+
+// Add address
+router.post("/addresses", async (req, res) => {
+  try {
+    const { line1, city, state, zip, country } = req.body;
+    if (!line1 || !city) return res.status(400).json({ message: "Address incomplete" });
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    user.addresses.push({ line1, city, state, zip, country });
+    await user.save();
+    res.json(user.addresses);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to add address" });
+  }
+});
+
+// Remove address
+router.delete("/addresses/:addressId", async (req, res) => {
+  try {
+    const { addressId } = req.params;
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const existingCount = user.addresses.length;
+    user.addresses = user.addresses.filter((address) => String(address._id) !== String(addressId));
+    if (user.addresses.length === existingCount) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+    await user.save();
+    res.json(user.addresses);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete address" });
+  }
+});
+
+// Delivery slots (static for demo)
+router.get("/delivery-slots", (req, res) => {
+  res.json([
+    { id: "slot-6-9", label: "6:00 AM - 9:00 AM" },
+    { id: "slot-9-12", label: "9:00 AM - 12:00 PM" },
+    { id: "slot-12-17", label: "12:00 PM - 5:00 PM" },
+  ]);
+});
+
+// Order history
+router.get("/order/history", async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch order history" });
+  }
+});
+
 module.exports = router;

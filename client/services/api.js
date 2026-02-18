@@ -122,4 +122,34 @@ export const removeCartItem = async (productId) => {
   return response.data;
 };
 
+export const getAddresses = async () => {
+  const response = await api.get("/user/addresses", authConfig());
+  return response.data;
+};
+
+export const addAddress = async (payload) => {
+  const response = await api.post("/user/addresses", payload, authConfig());
+  return response.data;
+};
+
+export const deleteAddress = async (addressId) => {
+  const response = await api.delete(`/user/addresses/${addressId}`, authConfig());
+  return response.data;
+};
+
+export const getDeliverySlots = async () => {
+  const response = await api.get("/user/delivery-slots", authConfig());
+  return response.data;
+};
+
+export const placeOrder = async (order) => {
+  const response = await api.post("/user/order", order, authConfig());
+  return response.data;
+};
+
+export const getOrderHistory = async () => {
+  const response = await api.get("/user/order/history", authConfig());
+  return response.data;
+};
+
 export default api;

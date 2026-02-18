@@ -10,6 +10,15 @@ const userSchema = new mongoose.Schema({
       product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
       quantity: { type: Number, default: 1, min: 1 }
     }
+  ],
+  addresses: [
+    {
+      line1: String,
+      city: String,
+      state: String,
+      zip: String,
+      country: String
+    }
   ]
 });
 

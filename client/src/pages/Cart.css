@@ -1,3 +1,29 @@
+/* Checkout button styles */
+.cart-checkout-btn-box {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cart-checkout-btn {
+  background: linear-gradient(90deg, #4caf50 0%, #388e3c 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 32px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(76,175,80,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.cart-checkout-btn:disabled {
+  background: #b7d7b0;
+  color: #e6f2e2;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 .cart-page {
   min-height: 100vh;
   padding: 20px 28px;

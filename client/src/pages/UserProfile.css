@@ -1,0 +1,181 @@
+.profile-page {
+  min-height: 100vh;
+  background: #f7fbf4;
+}
+
+.profile-content {
+  padding: 24px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.profile-card {
+  background: #ffffff;
+  border: 1px solid #e5efe0;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 18px 45px rgba(24, 46, 26, 0.05);
+}
+
+.profile-summary h1 {
+  margin: 4px 0 0;
+  font-size: 2rem;
+  color: #1d4b27;
+}
+
+.profile-eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1f5f2c;
+}
+
+.profile-email {
+  margin: 8px 0 0;
+  color: #56674f;
+}
+
+.profile-actions {
+  margin-top: 20px;
+}
+
+.profile-btn {
+  border-radius: 12px;
+  border: none;
+  background: #1f4528;
+  color: #ffffff;
+  padding: 12px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(31, 69, 40, 0.3);
+}
+
+.profile-subtitle {
+  margin: 6px 0 0;
+  color: #56674f;
+  max-width: 640px;
+}
+
+.profile-error,
+.profile-loading,
+.profile-empty {
+  margin: 14px 0;
+  color: #56674f;
+}
+
+.address-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.address-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.address-card {
+  border: 1px solid #e2eddc;
+  border-radius: 14px;
+  padding: 16px 18px;
+  background: #fbfef9;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.address-line {
+  margin: 0;
+  font-weight: 600;
+  color: #1f4528;
+}
+
+.address-meta {
+  margin: 4px 0 0;
+  color: #56674f;
+  font-size: 0.9rem;
+}
+
+.address-delete-btn {
+  border: none;
+  background: #ffeef0;
+  color: #bf1e2b;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.address-form {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #e2eddc;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.address-form input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #c8ddc1;
+  background: #ffffff;
+  font-size: 1rem;
+  color: #1f4528;
+}
+
+.form-error {
+  margin: 0;
+  color: #bf1e2b;
+  font-size: 0.9rem;
+}
+
+.address-submit-btn {
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: #1f4528;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.address-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .profile-content {
+    padding: 20px;
+  }
+
+  .address-grid {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-card {
+    padding: 22px;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .profile-actions {
+    display: flex;
+    justify-content: flex-start;
+  }
+}

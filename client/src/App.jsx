@@ -5,6 +5,10 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Cart from './pages/Cart'
 import Admin from './pages/Admin'
+import Checkout from './pages/Checkout'
+import OrderHistory from './pages/OrderHistory'
+import OrderConfirmation from './pages/OrderConfirmation'
+import UserProfile from './pages/UserProfile'
 
 function AdminRoute({ children }) {
   const token = localStorage.getItem('token')
@@ -35,6 +39,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
       <Route
         path="/admin"
         element={
@@ -43,6 +48,9 @@ function App() {
           </AdminRoute>
         }
       />
+      <Route path="/order-history" element={<OrderHistory />} />
+      <Route path="/order-confirmation" element={<OrderConfirmation />} />
+      <Route path="/account" element={<UserProfile />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

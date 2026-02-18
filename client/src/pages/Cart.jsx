@@ -49,6 +49,22 @@ function Cart() {
     navigate('/login')
   }
 
+  const handleAccountClick = () => {
+    if (!currentUser) {
+      navigate('/login')
+      return
+    }
+    navigate('/account')
+  }
+
+  const handleOrderHistoryClick = () => {
+    if (!currentUser) {
+      navigate('/login')
+      return
+    }
+    navigate('/order-history')
+  }
+
   const handleQuantityChange = async (productId, nextQuantity) => {
     if (actionLoadingId === productId) return
     const previousCart = cart
@@ -105,6 +121,8 @@ function Cart() {
         onCartClick={() => navigate('/cart')}
         onLogout={handleLogout}
         onAdminClick={() => navigate('/admin')}
+        onAccountClick={handleAccountClick}
+        onOrderHistoryClick={handleOrderHistoryClick}
       />
 
       <section className="cart-content">
@@ -161,6 +179,15 @@ function Cart() {
 
               <div className="cart-total">
                 <strong>Total: ₹ {cart.totalAmount}</strong>
+              </div>
+              <div className="cart-checkout-btn-box">
+                <button
+                  className="cart-checkout-btn"
+                  onClick={() => navigate('/checkout')}
+                  disabled={cart.items.length === 0}
+                >
+                  Proceed to Checkout
+                </button>
               </div>
             </>
           ) : (
