@@ -12,7 +12,6 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const dns = require("dns"); dns.setServers(["1.1.1.1", "8.8.8.8"]); 
 
 // Attempt DB connection on cold start but don't exit on failure (serverless-safe)
 let dbConnected = false;
