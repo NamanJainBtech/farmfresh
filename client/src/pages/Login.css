@@ -73,21 +73,21 @@
 
 .show-password-btn {
   border: 0;
-  background: transparent;
-  color: #2f7d3f;
+  border-radius: 5px;
+  color: #d2e3cd;
   font-weight: 600;
   cursor: pointer;
-  padding: 0 6px;
-  height: 90%;
+  padding: 0px 12px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
-  background: none;
+  background: #2f7d3f;
   box-shadow: none;
 }
 
-.auth-form button {
+.auth-form button:not(.show-password-btn) {
   margin-top: 16px;
   border: 0;
   border-radius: 10px;
